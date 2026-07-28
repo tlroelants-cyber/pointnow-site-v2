@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- The rosette reduced to three passes. Same construction as the hero
+       figure: petals whose centres sit on a ring, and the reading at dead
+       centre. Ultramarine on porcelain. -->
+  <rect width="32" height="32" rx="6" fill="#EDF0EF"/>
+  <g fill="none" stroke="#2B3DF5" stroke-width="1.5">
+    <circle cx="16" cy="11.4" r="7.4" opacity=".95"/>
+    <circle cx="11.9" cy="18.5" r="7.4" opacity=".55"/>
+    <circle cx="20.1" cy="18.5" r="7.4" opacity=".55"/>
+  </g>
+  <circle cx="16" cy="16" r="2.1" fill="#E8A02E"/>
+</svg>
