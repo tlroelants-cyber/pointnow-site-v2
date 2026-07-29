@@ -14,9 +14,14 @@
  *      probe rows. A screenshot of a bad score has to read as "measured
  *      precisely", never as "you failed", because these end up in decks.
  *
- *   2. DARK BLOCKS ARE NEUTRAL GRAPHITE, NEVER NAVY. The prototype at
- *      pointnow.vercel.app is a dark navy console and is a separate product.
- *      The site links to it and must not look like it.
+ *   2. DARK BLOCKS ARE NEUTRAL GRAPHITE, NEVER NAVY. This began as a rule about
+ *      keeping away from the prototype, which used to be a dark navy console.
+ *      The prototype has since been brought into this same system, so the rule
+ *      now means the opposite of what it used to: graphite is the SHARED dark
+ *      ground of both properties, navy appears in neither, and the console at
+ *      pointnow.vercel.app is supposed to look like this page.
+ *      Its half of the system lives in `../pointnow/app/globals.css` — change a
+ *      token here, change it there.
  *
  * Sections below run in page order after the system. Section padding is owned
  * by .band and its modifiers only — no element selector may set it, or the
@@ -496,20 +501,34 @@ a { color: inherit; }
 
 /* ══════════════════════════════════════════════════════════════════ nav ══ */
 
+/*
+ * The frosted ground lives on ::before, NOT on .nav itself, and it has to stay
+ * that way. backdrop-filter — like transform, filter and perspective — makes an
+ * element the containing block for its position:fixed descendants. The mobile
+ * nav sheet inside this bar is position:fixed;inset:0, so with the filter on
+ * .nav the sheet resolved against a 63px bar instead of the viewport: it opened
+ * as a one-line strip, and because opening also locks body scroll, the page went
+ * nowhere. Keep .nav free of anything that establishes a containing block.
+ */
 .nav {
   position: sticky;
   top: 0;
   z-index: 100;
+  border-bottom: 1px solid transparent;
+  transition: border-color 260ms var(--ease);
+}
+.nav::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   background: rgb(237 240 239 / 0.82);
   backdrop-filter: saturate(1.6) blur(14px);
   -webkit-backdrop-filter: saturate(1.6) blur(14px);
-  border-bottom: 1px solid transparent;
-  transition: border-color 260ms var(--ease), background 260ms var(--ease);
+  transition: background 260ms var(--ease);
 }
-.nav.is-stuck {
-  border-bottom-color: var(--rule);
-  background: rgb(237 240 239 / 0.94);
-}
+.nav.is-stuck { border-bottom-color: var(--rule); }
+.nav.is-stuck::before { background: rgb(237 240 239 / 0.94); }
 .nav__in {
   max-width: var(--wrap);
   margin-inline: auto;
@@ -551,6 +570,12 @@ a { color: inherit; }
 .nav__links a:not(.btn):hover { color: var(--ultra); }
 
 .nav__burger { display: none; }
+
+/* The sheet covers the viewport, but the reading rail (z 120) and the sticky
+   CTA bar (z 110) both outrank the nav's z 100 and would otherwise draw on top
+   of it. Neither means anything over an open menu. */
+.nav-open .railbar,
+.nav-open .stickybar { display: none; }
 
 /* ═════════════════════════════════════════════════════════════════ hero ══ */
 
@@ -1391,139 +1416,6 @@ a { color: inherit; }
 }
 .axtable .axscore { color: var(--ultra); font-weight: 500; }
 
-/* ═══════════════════════════════════════════════════════════ §9 player ══ */
-
-.player { margin-top: clamp(32px, 4vw, 52px); }
-.player__target {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 20px;
-  padding: clamp(20px, 2.6vw, 28px);
-  border-bottom: 1px solid rgb(255 255 255 / 0.1);
-}
-.player__target > div { flex: 1 1 320px; }
-.player__tname { font-weight: 600; font-size: 1.04rem; display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
-.tag {
-  font-family: var(--mono);
-  font-size: 0.62rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 3px 7px;
-  border-radius: 3px;
-  background: var(--amber);
-  color: var(--graphite);
-  font-weight: 500;
-}
-.player__tmeta { margin-top: 6px; font-size: 0.88rem; color: var(--on-dark-2); }
-
-.player__stage { padding: clamp(18px, 2.4vw, 26px); }
-.player__meter { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-.meter {
-  flex: 1 1 200px;
-  height: 3px;
-  background: rgb(255 255 255 / 0.12);
-  border-radius: 2px;
-  overflow: hidden;
-}
-.meter i {
-  display: block;
-  height: 100%;
-  width: 0;
-  background: var(--ultra-lift);
-  transition: width 180ms linear;
-}
-.player__count { font-family: var(--mono); font-size: 0.78rem; color: var(--on-dark-2); font-variant-numeric: tabular-nums; }
-.player__skip { font-family: var(--mono); font-size: 0.76rem; color: var(--ultra-lift); }
-.player__skip:hover { text-decoration: underline; }
-
-.feed {
-  margin-top: 18px;
-  display: grid;
-  gap: 0;
-  max-height: 340px;
-  overflow: hidden;
-}
-.feed li {
-  display: grid;
-  grid-template-columns: 84px 1fr auto auto;
-  gap: 14px;
-  align-items: center;
-  padding: 9px 2px;
-  border-bottom: 1px solid rgb(255 255 255 / 0.07);
-  font-family: var(--mono);
-  font-size: 0.78rem;
-  animation: feedin 260ms var(--ease) both;
-}
-@keyframes feedin { from { opacity: 0; transform: translateY(-6px); } }
-.feed .f-dim { color: var(--on-dark-2); font-size: 0.72rem; letter-spacing: 0.04em; }
-.feed .f-sev { font-size: 0.66rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--on-dark-2); }
-.feed .f-v { font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; }
-/* No red, no green. A pass recedes to a hairline; a failure gets full ink. */
-.feed li[data-v="pass"] { opacity: 0.3; }
-.feed li[data-v="pass"] .f-v { color: var(--on-dark-2); }
-.feed li[data-v="fail"] .f-id,
-.feed li[data-v="fail"] .f-v { color: var(--ultra-lift); font-weight: 500; }
-.feed li[data-v="fail"] { border-bottom-color: rgb(142 155 255 / 0.28); }
-
-.result {
-  display: grid;
-  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-  gap: clamp(24px, 4vw, 52px);
-  align-items: center;
-  padding: clamp(20px, 3vw, 34px);
-}
-.result__head { font-size: clamp(1.15rem, 2vw, 1.5rem); font-weight: 600; line-height: 1.2; letter-spacing: -0.02em; }
-.result__rem { margin-top: 16px; font-size: 0.95rem; color: var(--on-dark-2); line-height: 1.55; }
-.result__rem b { color: var(--amber); font-family: var(--mono); font-weight: 500; }
-
-.findings { padding: 0 clamp(20px, 3vw, 34px) clamp(24px, 3vw, 34px); }
-.findings__head {
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
-  color: var(--on-dark-2);
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgb(255 255 255 / 0.1);
-}
-.finding { padding: 18px 0; border-bottom: 1px solid rgb(255 255 255 / 0.07); display: grid; gap: 10px; }
-.finding__top { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-family: var(--mono); font-size: 0.72rem; color: var(--on-dark-2); }
-.finding__id { color: var(--ultra-lift); }
-.finding__sev { border: 1px solid rgb(255 255 255 / 0.2); padding: 2px 7px; border-radius: 3px; letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.64rem; }
-.finding__q { font-size: 0.92rem; color: var(--on-dark-2); }
-.finding__q::before { content: "→ "; color: var(--ultra-lift); }
-.finding__a { font-size: 0.95rem; line-height: 1.5; padding: 12px 15px; background: rgb(255 255 255 / 0.05); border-radius: var(--r); border-left: 2px solid var(--ultra-lift); }
-.finding__why { font-size: 0.86rem; color: var(--on-dark-2); font-style: italic; }
-
-.honesty {
-  margin-top: clamp(28px, 3.4vw, 40px);
-  padding: clamp(20px, 2.6vw, 26px);
-  border: 1px dashed rgb(255 255 255 / 0.24);
-  border-radius: var(--r);
-  display: grid;
-  gap: 12px;
-  max-width: 74ch;
-}
-.honesty__h {
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
-  color: var(--amber);
-}
-.honesty p:not(.honesty__h) { font-size: 0.92rem; line-height: 1.6; color: var(--on-dark-2); }
-.honesty strong { color: #fff; font-weight: 600; }
-
-.player__out {
-  margin-top: clamp(28px, 3.4vw, 44px);
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 16px 24px;
-}
-.player__expect { font-size: 0.88rem; color: var(--on-dark-2); max-width: 40ch; }
-
 /* ══════════════════════════════════════════════════ §10 the deliverable ══ */
 
 .deliver {
@@ -1901,7 +1793,7 @@ a { color: inherit; }
   .hero__row > div:not(.hero__gauge) { order: 1; }
   .why__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .incident, .machine, .axes, .result, .steps { grid-template-columns: 1fr; }
+  .incident, .machine, .axes, .steps { grid-template-columns: 1fr; }
   .steps__stage { position: static; }
   .steps__panels { gap: 44px; }
   .stage { aspect-ratio: 1 / 0.75; }
@@ -1935,6 +1827,10 @@ a { color: inherit; }
   }
   .nav__links.is-open { transform: none; }
   .nav__links[inert] { pointer-events: none; }
+  /* The sheet is fixed and covers the bar, so the wordmark has to be lifted
+     over it the same way the burger is — otherwise the open menu is an
+     unbranded blank page with a close button on it. */
+  .mark { z-index: 2; }
   .nav__links a:not(.btn) {
     font-size: 1.5rem;
     font-family: var(--display);
@@ -1973,8 +1869,6 @@ a { color: inherit; }
   body { font-size: 16px; }
   .why__grid, .stats { grid-template-columns: 1fr; }
   .beat { padding: 22px 18px 26px; }
-  .feed li { grid-template-columns: 76px 1fr auto; }
-  .feed .f-sev { display: none; }
   .ros__label { padding: 3px 6px; }
   .ros__lname { font-size: 0.62rem; }
   .ros__lscore { font-size: 0.6rem; }

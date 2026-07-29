@@ -72,17 +72,26 @@
     function syncInert() {
       links.inert = narrow.matches && burger.getAttribute("aria-expanded") !== "true";
     }
-    narrow.addEventListener("change", syncInert);
 
     function setOpen(open) {
       burger.setAttribute("aria-expanded", String(open));
       links.classList.toggle("is-open", open);
+      document.documentElement.classList.toggle("nav-open", open);
       document.body.style.overflow = open ? "hidden" : "";
       syncInert();
       if (!open) return;
       var first = links.querySelector("a");
       if (first) first.focus();
     }
+
+    /* Growing past the breakpoint turns the sheet back into the ordinary
+       desktop nav, but the body scroll lock it set on the way in belongs to the
+       sheet — left behind, it silently freezes the page at desktop width. Close
+       it properly rather than only re-syncing inert. */
+    narrow.addEventListener("change", function (e) {
+      if (!e.matches && burger.getAttribute("aria-expanded") === "true") setOpen(false);
+      else syncInert();
+    });
 
     syncInert();
 
@@ -476,124 +485,6 @@
     else scrubbers.push({ el: ros.node, prop: "--p", from: 0.12, to: 1, range: 0.55 });
   })();
 
-  /* ══════════════════════════════════════════════════════════ §9 player ══ */
-
-  (function player() {
-    var btn = $("#run-scan"), stage = $("#scan-stage"), feed = $("#feed"),
-        meter = $("#meter-fill"), count = $("#scan-count"),
-        result = $("#result"), findings = $("#findings"),
-        list = $("#findings-list"), more = $("#more-findings"),
-        honesty = $("#honesty"), skip = $("#skip-scan");
-
-    var timers = [], started = false, done = false;
-
-    var LABEL = {};
-    DIMENSIONS.forEach(function (d) { LABEL[d.key] = d.short || d.label; });
-
-    function row(p) {
-      var li = document.createElement("li");
-      li.dataset.v = p.verdict;
-      li.innerHTML =
-        '<span class="f-id">' + esc(p.id) + "</span>" +
-        '<span class="f-dim">' + esc(LABEL[p.dim] || p.dim) + "</span>" +
-        '<span class="f-sev">' + esc(p.sev) + "</span>" +
-        '<span class="f-v">' + (p.verdict === "fail" ? "Fail" : "Pass") + "</span>";
-      /* Newest at the top, so the stream reads like a live console. */
-      feed.insertBefore(li, feed.firstChild);
-    }
-
-    function progress(n) {
-      meter.style.width = (n / RUN.length) * 100 + "%";
-      count.textContent = n + " / " + RUN.length + " probes";
-    }
-
-    function finding(f) {
-      return '<li class="finding">' +
-        '<p class="finding__top">' +
-          '<span class="finding__id">' + esc(f.probeId) + "</span>" +
-          "<span>" + esc(f.dimension) + "</span>" +
-          '<span class="finding__sev">' + esc(f.severity) + "</span>" +
-        "</p>" +
-        '<p class="finding__q">' + esc(f.prompt) + "</p>" +
-        '<p class="finding__a">' + esc(f.reply) + "</p>" +
-        '<p class="finding__why">' + esc(f.rationale) + "</p>" +
-        "</li>";
-    }
-
-    function reveal() {
-      if (done) return;
-      done = true;
-      timers.forEach(clearTimeout);
-      progress(RUN.length);
-
-      btn.textContent = "Scan complete";
-      skip.hidden = true;
-
-      result.hidden = false;
-      findings.hidden = false;
-      honesty.hidden = false;
-
-      $("#result-rem").innerHTML =
-        "Fix the top three findings and the composite falls to <b>" + SCORES.remediation[0].score +
-        "</b>. Fix six and it reaches <b>" + SCORES.remediation[1].score +
-        "</b>. Fix ten and it reaches <b>" + SCORES.remediation[2].score + "</b>.";
-
-      list.innerHTML = TOP_FINDINGS.map(finding).join("");
-
-      rosettes.result.node.style.setProperty("--p", 1);
-      countTo(rosettes.result.readingEl, 0, SCORES.adjusted, 1100, 120, 0);
-      observeReveals(result);
-    }
-
-    function run() {
-      if (started) return;
-      started = true;
-      btn.disabled = true;
-      btn.textContent = "Scanning…";
-      stage.hidden = false;
-
-      if (REDUCED) {
-        RUN.forEach(row);
-        reveal();
-        return;
-      }
-
-      RUN.forEach(function (p, i) {
-        timers.push(setTimeout(function () {
-          row(p);
-          progress(i + 1);
-          if (i === RUN.length - 1) timers.push(setTimeout(reveal, 480));
-        }, 90 + i * 95));
-      });
-    }
-
-    btn.addEventListener("click", run);
-    skip.addEventListener("click", function () {
-      if (done) return;
-      if (!started) { run(); }
-      timers.forEach(clearTimeout);
-      feed.innerHTML = "";
-      RUN.forEach(row);
-      reveal();
-    });
-
-    more.addEventListener("click", function () {
-      list.insertAdjacentHTML("beforeend", MORE_FINDINGS.map(finding).join(""));
-      more.remove();
-    });
-
-    /* Starts itself when it comes into view — the section's promise is that
-       you watch it happen, so it should not need a click to keep that. Still
-       fires under reduced motion, where run() paints the finished result
-       immediately rather than animating to it. */
-    var io = new IntersectionObserver(function (e) {
-      if (!e[0].isIntersecting) return;
-      run();
-      io.disconnect();
-    }, { threshold: 0.25 });
-    io.observe($("#player"));
-  })();
-
   /* ═══════════════════════════════════════════════════ §10 the deliverable ══ */
 
   $("#deliver").innerHTML = DELIVERABLES.map(function (d, i) {
@@ -623,7 +514,9 @@
   $("#wedge").innerHTML = WEDGE.map(function (w, i) {
     return '<div class="wedge__item rise" style="--d:' + i * 80 + 'ms">' +
       '<p class="wedge__h">' + esc(w.head) + "</p>" +
-      '<p class="wedge__b">' + esc(w.body) + "</p></div>";
+      '<p class="wedge__b">' + esc(w.body) +
+        (w.cite ? '<a class="cite" href="#sources" aria-label="Source ' + w.cite + '">' + w.cite + "</a>" : "") +
+      "</p></div>";
   }).join("");
 
   /* Re-bind the audience links, which were rendered after the first pass. */
@@ -654,7 +547,7 @@
       "</div><div>" +
         '<p class="member__name">' + esc(full) + "</p>" +
         '<p class="member__role">' + esc(m.role) + "</p>" +
-        '<p class="member__detail">' + esc(m.detail) + "</p>" +
+        (m.detail ? '<p class="member__detail">' + esc(m.detail) + "</p>" : "") +
         (m.linkedin
           ? '<p class="member__li"><a class="arrow" href="' + esc(m.linkedin) +
             '" target="_blank" rel="noopener"><span>LinkedIn</span><span>↗</span></a></p>'

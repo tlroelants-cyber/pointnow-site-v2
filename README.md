@@ -30,9 +30,23 @@ assessed. The one accent, amber, marks the highest-risk axis and seals the
 issued profile. It never means danger.
 
 **2. Dark blocks are neutral graphite, never navy.**
-The prototype at [pointnow.vercel.app](https://pointnow.vercel.app/) is a dark
-navy console and is a *separate product*. This page links to it prominently and
-must not look like it.
+This started life as a rule about *keeping away from* the prototype, which was a
+dark navy console. The prototype has since been brought into this same system,
+so the rule now means the opposite of what it used to: **graphite is the shared
+dark ground of both properties, and navy appears in neither.** The console at
+[pointnow.vercel.app](https://pointnow.vercel.app/) is supposed to look like this
+page — same faces, same tokens, same wordmark, same rosette.
+
+Its half of the system is `../pointnow/app/globals.css`, and the two files carry
+the same token *names* deliberately so a value can be traced across by name.
+Change one, change the other. The prototype adds one thing this page does not
+have: its ground moves across the three steps — porcelain for the audit, graphite
+for the scan, porcelain again for the issued profile — which is §6 of this page
+acted out rather than described.
+
+One deliberate exception on that side: `/bot`, the Nordwind Air target, is
+excluded from all of it and keeps its own typeface and palette. It has to look
+like an ordinary airline product right up until it is measured.
 
 ---
 
@@ -129,6 +143,17 @@ visibility means the `focus()` that should move into the sheet on open lands one
 frame before the transition starts and is silently dropped. `inert` also does
 the right thing for the tab order and the accessibility tree. It is applied only
 below 860px — above that the same element is the ordinary desktop nav.
+
+**`.nav` must never carry `backdrop-filter`** — the frosted ground lives on
+`.nav::before` instead. `backdrop-filter`, like `transform` and `filter`, makes an
+element the containing block for its `position: fixed` descendants, and the sheet
+is a fixed child of the bar. With the filter on `.nav`, `inset: 0` resolved
+against a 63px bar rather than the viewport: the menu opened as a one-line strip,
+and since opening also locks body scroll, the page froze. Two related traps closed
+at the same time — the reading rail (z 120) and the sticky CTA bar (z 110) both
+outrank the nav's z 100 and are hidden via `html.nav-open` while the sheet is up,
+and crossing the breakpoint while open now closes the sheet properly instead of
+leaving `body { overflow: hidden }` behind at desktop width.
 
 Under `prefers-reduced-motion: reduce` **everything renders final**: rosette at
 full density, headlines revealed, counters at their end values, §6 unpinned into
@@ -234,6 +259,12 @@ Run against Chromium at 360 / 390 / 480 / 768 / 1024 / 1440px.
 - **Keyboard:** skip link first, visible 2px focus ring on every interactive
   element, mobile sheet takes focus on open, traps Tab, closes on Escape and
   returns focus to the burger. Desktop nav is never inert.
+- **Mobile nav sheet:** fills the viewport at 360/390/768px, all five items in
+  view and hit-testable, closes on link click and on crossing the breakpoint,
+  and releases the body scroll lock every way out.
+  *This one is checked by screenshot, not only by assertion — the first pass
+  verified the sheet's focus and Tab behaviour, all of which passed inside a
+  63px strip that was visibly broken.*
 - **Contrast:** every text pairing the page uses passes AA (lowest is 5.26:1,
   `--ultra` on putty). Amber-on-light measured at 1.7–2.2:1 and is used only for
   fills, exactly as intended.

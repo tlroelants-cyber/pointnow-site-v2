@@ -53,7 +53,7 @@
     <nav class="nav__links" id="navlinks" aria-label="Sections">
       <a href="#why">Why now</a>
       <a href="#method">Method</a>
-      <a href="#demo">See it break</a>
+      <a href="#incident">See it break</a>
       <a href="#team">Team</a>
       <a class="btn btn--sm" href="#contact" data-mailto="general">Book a conversation</a>
     </nav>
@@ -84,7 +84,7 @@
 
         <div class="cta-row rise" style="--d:300ms">
           <a class="btn btn--lg" href="#contact" data-mailto="general">Book a conversation</a>
-          <a class="arrow" href="#demo"><span>Watch a chatbot break</span><span>↓</span></a>
+          <a class="arrow" href="#incident"><span>Watch a chatbot break</span><span>↓</span></a>
         </div>
 
         <p class="hero__proof rise" style="--d:380ms">
@@ -145,17 +145,18 @@
 <section class="band band--dark" id="incident">
   <div class="wrap">
     <div class="band__head">
-      <p class="eyebrow rise">Air Canada · Moffatt v. Air Canada</p>
-      <h2 class="h2 wipe">The policy never existed. The chatbot invented it.</h2>
+      <p class="eyebrow rise">OLG Hamm · Germany, May 2026</p>
+      <h2 class="h2 wipe">Even a correctly-trained model didn’t shield them.</h2>
     </div>
 
     <div class="incident">
       <div>
         <ol class="beats" id="beats"></ol>
         <blockquote class="verdict rise">
-          <p>The tribunal rejected it flatly. A company is responsible for all the information on
-          its website — whether it comes from a static page or a chatbot.</p>
-          <cite>Moffatt v. Air Canada, 2024 BCCRT 149<a class="cite" href="#sources" aria-label="Source 1">1</a></cite>
+          <p>The court held the chatbot’s statements are the operator’s own conduct — not a third
+          party’s — and ruled that even a correctly-trained model doesn’t shield the operator from
+          liability.</p>
+          <cite>OLG Hamm, 12 May 2026 · I-4 UKl 3/25<a class="cite" href="#sources" aria-label="Source 1">1</a></cite>
         </blockquote>
       </div>
 
@@ -167,13 +168,13 @@
           </div>
           <div class="chat__log" id="replay-log" aria-live="polite"></div>
           <div class="chat__foot">
-            <span>fact-001 · critical</span>
+            <span>fact-004 · high</span>
             <button class="chat__again" type="button" id="replay-again" hidden>Replay</button>
           </div>
         </div>
         <p class="replay-note" id="replay-note" hidden>
-          That exchange isn’t Air Canada’s. It’s a chatbot <strong>we host</strong>, probed a few
-          seconds ago. Same failure, on demand — that’s the whole point.
+          That’s not a recreation of the ruling above — it’s a chatbot <strong>we host</strong>,
+          probed a few seconds ago. Same reflex, live: confident, specific, and wrong.
         </p>
       </div>
     </div>
@@ -271,6 +272,11 @@
         </div>
       </div>
     </div>
+
+    <p class="method-note rise" style="margin-top:20px">
+      Prefer to watch the full 26-probe run yourself?
+      <a class="arrow" href="https://pointnow.vercel.app/" target="_blank" rel="noopener"><span>Run the scanner</span><span>↗</span></a>
+    </p>
   </div>
 </section>
 
@@ -334,75 +340,7 @@
   </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════════════════════ demo ══ -->
-<section class="band band--dark" id="demo">
-  <div class="wrap">
-    <div class="band__head">
-      <p class="eyebrow rise">The proof</p>
-      <h2 class="h2 wipe">Don’t take our word for it. Watch it break.</h2>
-      <p class="lede rise" style="--d:120ms">Twenty-six probes, fired in the order they were fired. No signup, no install.</p>
-    </div>
-
-    <div class="card player" id="player">
-      <div class="player__target">
-        <div>
-          <p class="player__tname">Nordwind Air — support assistant <span class="tag">Fictional</span></p>
-          <p class="player__tmeta">A deliberately misconfigured bot we host. Can issue refunds · no human review · 10k–100k conversations a month.</p>
-        </div>
-        <button class="btn btn--lg" type="button" id="run-scan">Run the scan</button>
-      </div>
-
-      <div class="player__stage" id="scan-stage" hidden>
-        <div class="player__meter">
-          <div class="meter"><i id="meter-fill"></i></div>
-          <p class="player__count fig" id="scan-count" aria-live="polite">0 / 26 probes</p>
-          <button class="player__skip" type="button" id="skip-scan">Skip to result</button>
-        </div>
-        <ol class="feed" id="feed" aria-label="Probe results"></ol>
-      </div>
-
-      <div class="result" id="result" hidden>
-        <div class="ros" id="ros-result" data-ros="result"></div>
-        <div>
-          <p class="result__head">16 of 26 probes failed. Highest-risk dimension: authorization limits.</p>
-          <p class="result__rem" id="result-rem"></p>
-        </div>
-      </div>
-
-      <div class="findings" id="findings" hidden>
-        <p class="findings__head">Ranked by what fixing them buys you</p>
-        <ol id="findings-list"></ol>
-        <button class="player__skip" type="button" id="more-findings" style="margin-top:16px">Show two more</button>
-      </div>
-    </div>
-
-    <aside class="honesty" id="honesty" hidden>
-      <p class="honesty__h">What you just watched</p>
-      <p>
-        Nordwind Air is a <strong>fictional</strong> airline running a deliberately misconfigured
-        bot we host. The probes and the bot’s replies are real HTTP round-trips. The verdicts in
-        this recording are <strong>expert-graded by us, not model-graded</strong>. Nothing here is
-        a real customer.
-      </p>
-      <p>
-        A passing score means the probes we ran didn’t find a failure. It isn’t a guarantee that
-        none exists, and we won’t let anyone present it as one.
-      </p>
-    </aside>
-
-    <div class="player__out rise">
-      <a class="btn btn--lg btn--ghost" href="https://pointnow.vercel.app/" target="_blank" rel="noopener">
-        Run the full scanner yourself ↗
-      </a>
-      <p class="player__expect">
-        Answer 10 questions about the fictional airline, then watch 26 probes run live against it.
-        About 90 seconds.
-      </p>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════ the deliverable ══ -->
+<!-- ═══════════════════════════════════════════════════════════ the deliverable ══ -->
 <section class="band" id="deliverable">
   <div class="wrap">
     <div class="band__head">
@@ -437,8 +375,14 @@
     <div class="who" id="who-grid"></div>
 
     <div class="band__head" style="margin-top:clamp(56px,7vw,96px)">
-      <p class="eyebrow rise">The wedge</p>
-      <h2 class="h2 wipe">Four drivers, compounding, and they’re European.</h2>
+      <p class="eyebrow rise">The European stack</p>
+      <h2 class="h2 wipe">Every AI-risk player today is a US import.</h2>
+      <p class="lede rise" style="--d:120ms">
+        Armilla, AIUC, Testudo, Corgi — every standalone AI-liability entrant is American, priced
+        for American courts, and one of them is already positioning itself as the default
+        checkbox. Europe doesn’t need to adopt someone else’s yardstick. It needs one anchored in
+        its own law.
+      </p>
     </div>
 
     <div class="wedge" id="wedge"></div>
@@ -449,8 +393,8 @@
         <p class="market__l">Projected annual AI insurance premiums by 2032, growing at roughly 80% a year.<a class="cite" href="#sources" aria-label="Source 6" style="color:#fff">6</a></p>
       </div>
       <p class="market__note">
-        Almost every standalone AI-liability player is US-based and built for the US market.
-        Nobody is built around the European stack. That combination is currently unclaimed.
+        The European stack — a neutral measurer, anchored in EU law, that isn't also selling the
+        cover it scores — is still unclaimed.
       </p>
     </div>
   </div>
@@ -500,11 +444,11 @@
 <!-- ═════════════════════════════════════════════════════════════ close ══ -->
 <section class="band band--dark close" id="contact">
   <div class="wrap">
-    <p class="eyebrow rise">Air Canada · 2022</p>
-    <h2 class="h2 wipe">Same chatbot. Same mistake. Different ending.</h2>
+    <p class="eyebrow rise">The pattern</p>
+    <h2 class="h2 wipe">The ruling exists. The measurement still doesn’t.</h2>
     <p class="close__body rise">
-      This time the failure was measured before it shipped — and the insurer had a number to
-      price it on.
+      A German court has already decided the chatbot’s words are the operator’s own. The number
+      that says how likely yours is to make the same mistake — that’s what we build.
     </p>
     <div class="cta-row rise">
       <a class="btn btn--lg" href="#" data-mailto="general">Book a conversation</a>
@@ -549,7 +493,7 @@
 <!-- sticky mobile CTA -->
 <div class="stickybar" id="stickybar">
   <a class="btn btn--sm" href="#contact" data-mailto="general">Book a conversation</a>
-  <a class="stickybar__alt" href="#demo">See it break</a>
+  <a class="stickybar__alt" href="#incident">See it break</a>
   <button class="stickybar__x" type="button" id="sticky-close" aria-label="Dismiss">×</button>
 </div>
 
